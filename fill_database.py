@@ -1,0 +1,600 @@
+import random
+import mysql.connector
+from datetime import date, timedelta
+
+DB_NAME = "ihrf"
+
+CONFIG = {
+    "host": "localhost",
+    "user": "root",
+    "password": "root_password",
+}
+FIRST_NAMES_M = [
+    "Piotr",
+    "Krzysztof",
+    "Tomasz",
+    "Andrzej",
+    "Paweł",
+    "Michał",
+    "Jan",
+    "Marcin",
+    "Jakub",
+    "Adam",
+    "Łukasz",
+    "Mateusz",
+    "Grzegorz",
+    "Marek",
+    "Stanisław",
+    "Wojciech",
+    "Mariusz",
+    "Dariusz",
+    "Maciej",
+    "Rafał",
+    "Robert",
+    "Kamil",
+    "Zbigniew",
+    "Szymon",
+    "Dawid",
+    "Kacper",
+    "Jacek",
+    "Jerzy",
+    "Bartosz",
+    "Artur",
+    "Ryszard",
+    "Józef",
+    "Jarosław",
+    "Tadeusz",
+    "Sebastian",
+    "Damian",
+    "Sławomir",
+    "Patryk",
+    "Antoni",
+    "Filip",
+    "Roman",
+    "Mirosław",
+    "Janusz",
+    "Daniel",
+    "Karol",
+    "Przemysław",
+    "Aleksander",
+    "Henryk",
+    "Adrian",
+    "Mikołaj",
+]
+
+LAST_NAMES = [
+    "Nowak",
+    "Kowalski",
+    "Wiśniewski",
+    "Wójcik",
+    "Kowalczyk",
+    "Kamiński",
+    "Lewandowski",
+    "Zieliński",
+    "Szymański",
+    "Woźniak",
+    "Dąbrowski",
+    "Kozłowski",
+    "Jankowski",
+    "Mazur",
+    "Kwiatkowski",
+    "Wojciechowski",
+    "Krawczyk",
+    "Kaczmarek",
+    "Piotrowski",
+    "Grabowski",
+    "Zając",
+    "Pawłowski",
+    "Michalski",
+    "Król",
+    "Wieczorek",
+    "Jabłoński",
+    "Wróbel",
+    "Nowicki",
+    "Majewski",
+    "Olszewski",
+]
+
+CITIES = [
+    "Nowy Jork",
+    "Londyn",
+    "Paryż",
+    "Tokio",
+    "Berlin",
+    "Rzym",
+    "Madryt",
+    "Barcelona",
+    "Amsterdam",
+    "Praga",
+    "Warszawa",
+    "Kraków",
+    "Sydney",
+    "Toronto",
+    "Vancouver",
+    "Rio de Janeiro",
+    "Buenos Aires",
+    "Meksyk",
+    "Los Angeles",
+    "San Francisco",
+    "Dubaj",
+    "Singapur",
+    "Hongkong",
+    "Seul",
+    "Bangkok",
+    "Sao Paulo",
+    "Johannesburg",
+    "Kair",
+    "Delhi",
+    "Oslo",
+]
+
+HAMSTER_NAMES = [
+    "Bąbel",
+    "Keks",
+    "Nugat",
+    "Tofik",
+    "Pixel",
+    "Piku",
+    "Koko",
+    "Mango",
+    "Zuzu",
+    "Bubu",
+    "Chrupek",
+    "Drops",
+    "Biszkopt",
+    "Puszek",
+    "Miodzik",
+    "Cynamon",
+    "Karmel",
+    "Kluska",
+    "Pączek",
+    "Batonik",
+    "Fistaszek",
+    "Orzeszek",
+    "Ziarno",
+    "Pestka",
+    "Kuleczka",
+    "Turbo",
+    "Iskra",
+    "Błysk",
+    "Echo",
+    "Lucky",
+    "Cookie",
+    "Pepper",
+    "Mocha",
+    "Toffee",
+    "Gizmo",
+    "Nemo",
+    "Frodo",
+    "Ziggy",
+    "Cosmo",
+    "Sunny",
+]
+
+COMPANY_PREFIX = [
+    "Pol",
+    "Euro",
+    "Tech",
+    "Green",
+    "Nova",
+    "Vita",
+    "Golden",
+    "Speed",
+    "Prime",
+    "Mega",
+]
+COMPANY_SUFFIX = [
+    "Corp",
+    "Solutions",
+    "Group",
+    "Industries",
+    "Partners",
+    "Labs",
+    "Systems",
+    "Foundation",
+    "Holdings",
+    "Media",
+]
+
+SUBSTANCES = [
+    "Kofeina (wys. dawka)",
+    "Pseudoefedryna",
+    "Metylheksanamina",
+    "Efedryna",
+    "Modafinil",
+    "Stymulant X",
+]
+
+FUNDING_SOURCE_NAMES = [
+    "Dotacja miejska",
+    "Grant ministerialny",
+    "Program rozwoju sportu",
+    "Darowizny prywatne",
+    "Składki członkowskie",
+]
+
+TODAY = date(2026, 2, 1)
+PREV_YEAR_START = date(2025, 1, 1)
+PREV_YEAR_END = date(2025, 12, 31)
+
+MIN_WAGE_2026 = 4806.00
+
+
+def rand_date(d1: date, d2: date) -> date:
+    """Losowa data z [d1, d2]."""
+    if d2 < d1:
+        d1, d2 = d2, d1
+    delta = (d2 - d1).days
+    return d1 + timedelta(days=random.randint(0, delta))
+
+
+def weighted_choice(options):
+    """options = [(value, weight), ...]"""
+    total = sum(w for _, w in options)
+    r = random.uniform(0, total)
+    upto = 0
+    for v, w in options:
+        if upto + w >= r:
+            return v
+        upto += w
+    return options[-1][0]
+
+
+def make_person():
+    first = random.choice(FIRST_NAMES_M)
+    last = random.choice(LAST_NAMES)
+    return first, last
+
+
+def make_company():
+    name = f"{random.choice(COMPANY_PREFIX)}{random.choice(COMPANY_SUFFIX)}"
+    if len(name) < 6:
+        name += " Sp. z o.o."
+    return name
+
+
+def make_email(first, last, company):
+    base = f"{first}.{last}".lower()
+    domain = company.lower().replace(" ", "").replace(".", "").replace(",", "")
+    return f"{base}@{domain}.pl"
+
+
+def make_hamster_name(existing):
+    for _ in range(2000):
+        name = random.choice(HAMSTER_NAMES)
+        if random.random() < 0.25:
+            name += str(random.randint(2, 9))
+        if name not in existing and 3 <= len(name) <= 20:
+            existing.add(name)
+            return name
+    raise RuntimeError("Nie udało się wygenerować unikalnej nazwy chomika.")
+
+
+def seed_employees(cursor):
+    org_start = date(2019, 1, 1)
+
+    employees = []
+    n = 5
+    for i in range(n):
+        first, last = make_person()
+        job = f"Staff_{i}"
+        start = rand_date(org_start, date(2024, 12, 31))
+        end = None
+        salary = MIN_WAGE_2026 + random.randint(1000, 5000)
+        employees.append((first, last, job, start, end, salary))
+
+    cursor.executemany(
+        "INSERT INTO employees (first_name, last_name, job_title, start_date, end_date, salary_amount) VALUES (%s,%s,%s,%s,%s,%s)",
+        employees,
+    )
+    cursor.execute("SELECT employee_id, start_date FROM employees ORDER BY employee_id")
+    rows = cursor.fetchall()
+    return rows
+
+
+def seed_sponsors_and_sponsorships(cursor):
+    sponsors = []
+    for _ in range(10):
+        rep_first, rep_last = make_person()
+        company = make_company()
+        rep = f"{rep_first} {rep_last}"
+        email = make_email(rep_first, rep_last, company)
+        sponsors.append((company, rep, email))
+
+    cursor.executemany(
+        "INSERT INTO sponsors (company_name, representative_name, contact_email) VALUES (%s,%s,%s)",
+        sponsors,
+    )
+    cursor.execute("SELECT sponsor_id FROM sponsors ORDER BY sponsor_id")
+    sponsor_ids = [r[0] for r in cursor.fetchall()]
+
+    sponsorships = []
+    for _ in range(15):
+        sid = random.choice(sponsor_ids)
+        start = rand_date(date(2019, 1, 1), PREV_YEAR_END)
+        months = random.randint(3, 18)
+        end = start + timedelta(days=months * 30)
+        amount = round(random.uniform(5000, 250000), 2)
+        sponsorships.append((sid, start, end, amount))
+
+    cursor.executemany(
+        "INSERT INTO sponsorships (sponsor_id, start_date, end_date, contribution_amount) VALUES (%s,%s,%s,%s)",
+        sponsorships,
+    )
+
+
+def seed_funding_sources(cursor):
+    funding = []
+    for name in FUNDING_SOURCE_NAMES:
+        start = rand_date(date(2019, 1, 1), PREV_YEAR_END)
+        end = (
+            None
+            if random.random() < 0.4
+            else (start + timedelta(days=random.randint(180, 900)))
+        )
+        amount = round(random.uniform(20000, 800000), 2)
+        funding.append((name, amount, start, end))
+
+    cursor.executemany(
+        "INSERT INTO funding_sources (source_name, amount, start_date, end_date) VALUES (%s,%s,%s,%s)",
+        funding,
+    )
+
+
+def seed_hamsters(cursor):
+    existing_names = set()
+    hamsters = []
+    owners = []
+    for oid in range(1, 41):
+        first, last = make_person()
+        owners.append((oid, f"{first} {last}"))
+
+    for _ in range(80):
+        name = make_hamster_name(existing_names)
+        sex = random.choice(["M", "F"])
+
+        birth = rand_date(date(2019, 1, 1), date(2025, 10, 1))
+
+        retire = None
+        if random.random() < 0.25:
+            retire_cand = birth + timedelta(days=random.randint(500, 900))
+            # nie wyprzedzaj zbytnio "dziś"
+            if retire_cand <= TODAY:
+                retire = retire_cand
+        else:
+            retire_cand = birth + timedelta(weeks=157)
+            if retire_cand <= TODAY:
+                retire = retire_cand
+
+        owner_id, owner_name = random.choice(owners)
+
+        networth = round(random.uniform(10_000, 10_000_000), 2)
+
+        hamsters.append((name, birth, retire, sex, owner_id, owner_name, networth))
+
+    cursor.executemany(
+        """INSERT INTO hamsters
+           (name, birth_date, retire_date, sex, owner_id, owner_name, owner_networth)
+           VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+        hamsters,
+    )
+    cursor.execute(
+        "SELECT hamster_id, birth_date, retire_date FROM hamsters ORDER BY hamster_id"
+    )
+    return cursor.fetchall()
+
+
+def generate_result_for_discipline_id(discipline_id):
+    if discipline_id == 1:  # Bieg na 2m
+        return round(random.uniform(0.7, 3.5), 2)
+
+    if discipline_id == 2:  # Bieg na 100m
+        return round(random.uniform(8.0, 45.0), 2)
+
+    if discipline_id == 3:  # Bieg przez płotki (20m)
+        return round(random.uniform(3.0, 25.0), 2)
+
+    if discipline_id == 4:  # Formuła CH: Sprint (20m)
+        return round(random.uniform(1.2, 12.0), 2)
+
+    if discipline_id == 5:  # Formuła CH: Endurance (1km)
+        return round(random.uniform(80.0, 800.0), 2)
+
+    return round(random.uniform(5.0, 60.0), 2)
+
+
+def seed_disciplines(cursor):
+    disciplines = [
+        (
+            "Bieg na 2m",
+            "naturalna",
+            "Sprint na dystansie 2m",
+        ),
+        (
+            "Bieg na 100m",
+            "naturalna",
+            "Maraton na dystansie 100m",
+        ),
+        ("Bieg przez płotki", "naturalna", "Bieg przez płotki na dystansie 20m"),
+        ("Formuła CH: Sprint", "formula_ch", "Wyścig na 20m"),
+        (
+            "Formuła CH: Endurance",
+            "formula_ch",
+            "Wyścig na 1km",
+        ),
+    ]
+    cursor.executemany(
+        "INSERT INTO disciplines (name, category, description) VALUES (%s,%s,%s)",
+        disciplines,
+    )
+    cursor.execute("SELECT discipline_id FROM disciplines ORDER BY discipline_id")
+    return [r[0] for r in cursor.fetchall()]
+
+
+def seed_prohibited_substances(cursor):
+    cursor.executemany(
+        "INSERT INTO prohibited_substances (name) VALUES (%s)",
+        [(s,) for s in SUBSTANCES],
+    )
+    cursor.execute(
+        "SELECT substance_id FROM prohibited_substances ORDER BY substance_id"
+    )
+    return [r[0] for r in cursor.fetchall()]
+
+
+def seed_doping_controls(cursor, hamster_rows, substance_ids):
+    controls = []
+    hamster_ids = [r[0] for r in hamster_rows]
+
+    for _ in range(120):
+        hid = random.choice(hamster_ids)
+
+        birth = next(b for (i, b, r) in hamster_rows if i == hid)
+        start = max(date(2021, 1, 1), birth + timedelta(days=60))
+        end = PREV_YEAR_END
+        control_date = rand_date(start, end)
+
+        is_positive = 1 if random.random() < 0.08 else 0
+        substance_id = random.choice(substance_ids) if is_positive else None
+
+        controls.append((hid, control_date, substance_id, is_positive))
+
+    cursor.executemany(
+        "INSERT INTO doping_controls (hamster_id, control_date, substance_id, is_positive) VALUES (%s,%s,%s,%s)",
+        controls,
+    )
+
+
+def get_disqualified_dates(cursor):
+    cursor.execute("""
+        SELECT hamster_id, MIN(control_date) AS first_pos_date
+        FROM doping_controls
+        WHERE is_positive = 1
+        GROUP BY hamster_id
+    """)
+    return {hid: d for (hid, d) in cursor.fetchall()}
+
+
+def seed_competitions(
+    cursor,
+    discipline_ids,
+    hamster_rows,
+    disqualified_dates,
+    org_start_year=2019,
+    end_year=2025,
+):
+    ham_map = {hid: (birth, retire) for (hid, birth, retire) in hamster_rows}
+
+    competitions = []
+
+    for year in range(org_start_year, end_year + 1):
+        n = random.randint(10, 15)
+        year_start = date(year, 1, 1)
+        year_end = date(year, 12, 31)
+
+        for _ in range(n):
+            discipline_id = random.choice(discipline_ids)
+            location = random.choice(CITIES)
+
+            spectators_stadium = random.randint(2000, 8000)
+
+            competition_date = rand_date(year_start, year_end)
+
+            eligible = []
+            for hid, (birth, retire) in ham_map.items():
+                if competition_date < birth + timedelta(days=60):
+                    continue
+                if retire is not None and competition_date > retire:
+                    continue
+                dq = disqualified_dates.get(hid)
+                if dq is not None and competition_date >= dq:
+                    continue
+                eligible.append(hid)
+
+            tries = 0
+            while not eligible and tries < 30:
+                competition_date = rand_date(year_start, year_end)
+                eligible = []
+                for hid, (birth, retire) in ham_map.items():
+                    if competition_date < birth + timedelta(days=60):
+                        continue
+                    if retire is not None and competition_date > retire:
+                        continue
+                    dq = disqualified_dates.get(hid)
+                    if dq is not None and competition_date >= dq:
+                        continue
+                    eligible.append(hid)
+                tries += 1
+
+            if not eligible:
+                continue
+
+            hamster_id = random.choice(eligible)
+
+            winner_result = generate_result_for_discipline_id(discipline_id)
+
+            competitions.append(
+                (
+                    discipline_id,
+                    competition_date,
+                    location,
+                    spectators_stadium,
+                    hamster_id,
+                    float(winner_result),
+                )
+            )
+
+    cursor.executemany(
+        """INSERT INTO competitions
+           (discipline_id, competition_date, location, spectators_stadium, hamster_id, winner_result)
+           VALUES (%s,%s,%s,%s,%s,%s)""",
+        competitions,
+    )
+
+
+def main():
+    random.seed(344)
+
+    conn = mysql.connector.connect(**CONFIG, database=DB_NAME)
+    cursor = conn.cursor()
+
+    seed_employees(cursor)
+
+    seed_sponsors_and_sponsorships(cursor)
+    seed_funding_sources(cursor)
+
+    hamster_rows = seed_hamsters(cursor)
+    discipline_ids = seed_disciplines(cursor)
+
+    substance_ids = seed_prohibited_substances(cursor)
+    seed_doping_controls(cursor, hamster_rows, substance_ids)
+    disqualified_dates = get_disqualified_dates(cursor)
+
+    seed_competitions(
+        cursor,
+        discipline_ids,
+        hamster_rows,
+        disqualified_dates,
+        org_start_year=2019,
+        end_year=2025,
+    )
+    conn.commit()
+
+    cursor.execute("SELECT COUNT(*) FROM employees")
+    emp = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) FROM hamsters")
+    ham = cursor.fetchone()[0]
+    cursor.execute(
+        "SELECT COUNT(*) FROM competitions WHERE competition_date BETWEEN %s AND %s",
+        (PREV_YEAR_START, PREV_YEAR_END),
+    )
+    comps_2025 = cursor.fetchone()[0]
+
+    print(f"OK. employees={emp}, hamsters={ham}, competitions_2025={comps_2025}")
+
+    cursor.close()
+    conn.close()
+
+
+if __name__ == "__main__":
+    main()

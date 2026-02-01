@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Analiza danych federacji IH RF</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+h1, h2, h3 { color: #333; }
+</style>
+</head>
+<body>
+
+<h1>Analiza danych federacji IH RF 🐹</h1>
+<p><strong>Autor:</strong> …<br>
+<strong>Data:</strong> …<br>
+<strong>Narzędzia:</strong> Python (pandas, matplotlib), Jupyter Notebook<br>
+<strong>Źródło danych:</strong> baza MySQL <code>ihrf</code></p>
+
+<h2>1. Wprowadzenie</h2>
+<p>Celem raportu jest analiza działalności federacji sportowej IH RF organizującej zawody sportowe dla chomików.
+Analiza obejmuje aspekty sportowe, popularność dyscyplin oraz sytuację finansową federacji.</p>
+
+<h2>2. Opis danych</h2>
+<p>W analizie wykorzystano tabele: competitions, disciplines, hamsters, employees, funding_sources,
+sponsorships oraz doping_controls. Ponieważ baza nie zawiera tabeli uczestników, liczbę uczestników
+przybliżono jako liczbę unikalnych chomików biorących udział w zawodach.</p>
+
+<h2>3. Najlepsi sportowcy</h2>
+<p>Najlepszych chomików wyznaczono osobno dla każdej dyscypliny na podstawie liczby zwycięstw
+oraz średniego czasu. Analiza wykazała specjalizację chomików w poszczególnych konkurencjach.</p>
+
+<h2>4. Szczyt kariery</h2>
+<p>Szczyt kariery zdefiniowano jako okres pomiędzy pierwszym a ostatnim zwycięstwem.
+Typowy szczyt kariery trwa od kilkuset dni do kilku lat.</p>
+
+<h2>5. Majątek właściciela a wyniki</h2>
+<p>Analiza statystyczna nie wykazała istotnej zależności pomiędzy majątkiem właściciela
+a wynikami sportowymi chomików w większości dyscyplin.</p>
+
+<h2>6. Popularność sportu</h2>
+<p>Liczba zawodów oraz unikalnych chomików w czasie wskazuje na stabilną lub rosnącą popularność sportu.</p>
+
+<h2>7. Rentowność federacji</h2>
+<p>Porównanie przychodów (dotacje i sponsoring) z wydatkami (wynagrodzenia) pokazuje,
+że federacja funkcjonuje finansowo stabilnie, choć zależnie od zewnętrznych źródeł finansowania.</p>
+
+<h2>8. Atrakcyjność dyscyplin</h2>
+<p>Najbardziej atrakcyjne dla widzów i sponsorów są dyscypliny o największej średniej widowni stadionowej.</p>
+
+<h2>9. Podsumowanie</h2>
+<ul>
+<li>Najlepsi zawodnicy różnią się w zależności od dyscypliny.</li>
+<li>Szczyt kariery chomików jest ograniczony czasowo.</li>
+<li>Majątek właściciela rzadko daje przewagę sportową.</li>
+<li>Sport utrzymuje stabilną popularność.</li>
+<li>Federacja jest finansowo zrównoważona.</li>
+</ul>
+
+<h2>10. Automatyzacja</h2>
+<p>Raport został wygenerowany automatycznie z notebooka Jupyter przy użyciu narzędzia nbconvert.</p>
+
+</body>
+</html>
